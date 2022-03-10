@@ -1,22 +1,16 @@
 const searchBar = document.getElementById("searchBar");
 const pokedex = document.getElementById("pokedex");
 const container = document.getElementById("container");
-const charactersList = document.getElementById("charactersList");
-const pokemonContainer = document.querySelector(".pokemon-container");
 let dataArray = [];
 let pokemon;
 
-// console.log("searchBar", searchBar);
-
 searchBar.addEventListener("keyup", (e) => {
   const searchString = e.target.value.toLowerCase();
-  // console.log("searchString1", searchString);
-
   const filteredCharacters = pokemon.filter((pokeman) => {
     return pokeman.name.toLowerCase().includes(searchString);
   });
+
   displayPokemon(filteredCharacters);
-  // console.log("filteredCharacters", filteredCharacters);
 });
 
 const loadCharacters = async () => {
@@ -24,8 +18,6 @@ const loadCharacters = async () => {
     $.getJSON(`https://pokeapi.co/api/v2/pokemon/${i}`, function (data) {
       {
         dataArray.push(data);
-        // console.log("data", data);
-
         pokemon = dataArray.map((result) => ({
           name: result.name,
           image: result.sprites["front_default"],
@@ -33,40 +25,87 @@ const loadCharacters = async () => {
           type: result.types.map((type) => type.type.name).join(", "),
           id: result.id,
         }));
-        //   console.log("pokemon", pokemon);
       }
     });
   }
 };
+
 loadCharacters();
 
-const loadFlipImage = (img, flipIamge) => (img.src = flipIamge);
+const loadFlipImage = (img, flipIamge, id) => {
+  img.src = flipIamge;
+  document.getElementById(id).style = "display:block";
+};
 
-const revertFlipImage = (img, frontIamge) => (img.src = frontIamge);
+const revertFlipImage = (img, frontIamge, id) => {
+  img.src = frontIamge;
+  document.getElementById(id).style = "display:none";
+};
+
 var saveData = [];
 const save = (pokeman) => {
+  const isExists = saveData.findIndex((i) => i.id === pokeman.id);
+  if (isExists >= 0) {
+    alert("Image" + " " + pokeman.name + " " + "already exists");
+    return false;
+  }
   saveData.push(pokeman);
-  console.log(pokeman);
-  appendContainer();
-};
-const appendContainer = () => {
-  const pokemonHTMLString = saveData.map(
-    (pokeman) => `
-      
-            <img class="card-image" src="${pokeman}"  />
-      
-        `
-  );
-  container.innerHTML = pokemonHTMLString;
+  reloadImage();
+  disablebuttons();
+  document.getElementById("imageContainer").style = "display:block";
 };
 
-const displayPokemon = (pokemon1) => {
-  const pokemonHTMLString = pokemon1.map(
-    (pokeman) => '<li class="card"><center><img class="card-image" onmouseout="revertFlipImage(this,\''+pokeman.image+'\')"'+
-            'onmouseover="loadFlipImage(this,\''+pokeman.flipIamge+'\')" src="'+pokeman.image+'" width="400" height="500" />'+
-            '<h2 class="card-title">'+pokeman.name+'</h2><p class="card-subtitle">'+
-            'Type: '+pokeman.type+'</p></center><button value="save" onclick="save(\''+pokeman.image+'\')" >save</button></li>'
+const previousImage = () => {
+  counter = counter > 0 && counter - 1;
+  reloadImage();
+  disablebuttons();
+};
 
+const disablebuttons = () => {
+  if (counter === 0) document.getElementById("previous").disabled = true;
+  else document.getElementById("previous").disabled = false;
+  document.getElementById("next").disabled =
+    counter === saveData.length - 1 ? true : false;
+};
+
+const nextImage = () => {
+  counter = counter < saveData.length && counter + 1;
+  reloadImage();
+  disablebuttons();
+};
+
+const retriveData = (id) => {
+  let data = saveData.find((i) => i.id == id);
+  displayPokemon([data]);
+};
+var counter = 0;
+const reloadImage = () => {
+  const currentImage = saveData.length > counter && saveData[counter];
+  container.innerHTML =
+    currentImage &&
+    `<img class="card-image" onclick="retriveData('${currentImage.id}')" src="${currentImage.image}"  />`;
+};
+
+const displayPokemon = (pokemonData) => {
+  const pokemonHTMLString = pokemonData.map(
+    (pokeman) =>
+      `<li ><center><img  onmouseout=revertFlipImage(this,"${pokeman.image}","${
+        pokeman.id
+      }")
+      onmouseover=loadFlipImage(this,"${pokeman.flipIamge}","${
+        pokeman.id
+      }") src="${pokeman.image}" width="200" height="200"/>
+      <h2 class="card-title">${pokeman.name}</h2>
+      <div style="display:none" id=${
+        pokeman.id
+      }><p class="card-subtitle">Type:${pokeman.type}</p> </div>
+      </center>
+      <div width="100%" style="text-align:center">
+      <button value="save" onclick='save(${JSON.stringify(
+        pokeman
+      )})' >save</button>
+      </div>
+      </li>`
   );
-                          pokedex.innerHTML = pokemonHTMLString;
+  pokedex.innerHTML = pokemonHTMLString;
 };
