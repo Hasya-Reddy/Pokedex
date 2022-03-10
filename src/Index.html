@@ -6,16 +6,29 @@
 </head>
 <html>
     <body>
-        <h2>Pokemon App!</h2>
-        <input
-        type="text"
-        name="searchBar"
-        id="searchBar"
-        placeholder="search for a characters"
-        />
-    
-        <ul id="pokedex"></ul>
-        <script src="index.js"></script>
+        <h2><center>Pokemon App! </center></h2>
+        <center>
+            <input
+            type="text"
+            name="searchBar"
+            id="searchBar"
+            placeholder="search for a characters"
+            />
 
+        </center>
+    
+        <ul style="list-style-type:none" id="pokedex"></ul>
+
+        <div id="imageContainer" style="display: none;">
+            <center>
+                <button id="previous" onclick="previousImage()"><</button>
+                <div id="container"> </div>
+                <button id="next" onclick="nextImage()">></button>
+
+            </center>
+            
+        </div>
+        
+        <script src="index.js"></script>
 </body>
 </html>
