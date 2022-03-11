@@ -51,39 +51,18 @@ const save = (pokeman) => {
   }
   saveData.push(pokeman);
   reloadImage();
-  disablebuttons();
-  document.getElementById("imageContainer").style = "display:block";
-};
-
-const previousImage = () => {
-  counter = counter > 0 && counter - 1;
-  reloadImage();
-  disablebuttons();
-};
-
-const disablebuttons = () => {
-  if (counter === 0) document.getElementById("previous").disabled = true;
-  else document.getElementById("previous").disabled = false;
-  document.getElementById("next").disabled =
-    counter === saveData.length - 1 ? true : false;
-};
-
-const nextImage = () => {
-  counter = counter < saveData.length && counter + 1;
-  reloadImage();
-  disablebuttons();
 };
 
 const retriveData = (id) => {
   let data = saveData.find((i) => i.id == id);
   displayPokemon([data]);
 };
-var counter = 0;
 const reloadImage = () => {
-  const currentImage = saveData.length > counter && saveData[counter];
-  container.innerHTML =
-    currentImage &&
-    `<img class="card-image" onclick="retriveData('${currentImage.id}')" src="${currentImage.image}"  />`;
+  $("#imageContainer").show();
+  container.innerHTML = saveData.map(
+    (data) =>
+      `<img class="card-image" onclick="retriveData('${data.id}')" src="${data.image}"  />`
+  );
 };
 
 const displayPokemon = (pokemonData) => {
